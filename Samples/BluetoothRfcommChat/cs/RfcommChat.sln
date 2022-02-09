@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfcommChat", "RfcommChat.csproj", "{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}"
 EndProject
@@ -12,6 +12,9 @@ Global
 		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		mia|ARM = mia|ARM
+		mia|x64 = mia|x64
+		mia|x86 = mia|x86
 		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
@@ -26,6 +29,15 @@ Global
 		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.Debug|x86.ActiveCfg = Debug|x86
 		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.Debug|x86.Build.0 = Debug|x86
 		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.Debug|x86.Deploy.0 = Debug|x86
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|ARM.ActiveCfg = mia|ARM
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|ARM.Build.0 = mia|ARM
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|ARM.Deploy.0 = mia|ARM
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|x64.ActiveCfg = Release|x64
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|x64.Build.0 = Release|x64
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|x64.Deploy.0 = Release|x64
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|x86.ActiveCfg = mia|x86
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|x86.Build.0 = mia|x86
+		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.mia|x86.Deploy.0 = mia|x86
 		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.Release|ARM.ActiveCfg = Release|ARM
 		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.Release|ARM.Build.0 = Release|ARM
 		{B047BD4F-9FBE-577F-9D3C-AA81DFD0DAD2}.Release|ARM.Deploy.0 = Release|ARM
@@ -41,6 +53,12 @@ Global
 		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.Debug|x64.Build.0 = Debug|x64
 		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.Debug|x86.ActiveCfg = Debug|x86
 		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.Debug|x86.Build.0 = Debug|x86
+		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.mia|ARM.ActiveCfg = mia|ARM
+		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.mia|ARM.Build.0 = mia|ARM
+		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.mia|x64.ActiveCfg = Release|x64
+		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.mia|x64.Build.0 = Release|x64
+		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.mia|x86.ActiveCfg = mia|x86
+		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.mia|x86.Build.0 = mia|x86
 		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.Release|ARM.ActiveCfg = Release|ARM
 		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.Release|ARM.Build.0 = Release|ARM
 		{0ADC7256-372A-5E4A-AB1A-1983C2907F07}.Release|x64.ActiveCfg = Release|x64
@@ -50,5 +68,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C180C12-E424-458E-82AF-BCB8CF426522}
 	EndGlobalSection
 EndGlobal

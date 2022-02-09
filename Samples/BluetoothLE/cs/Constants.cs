@@ -31,11 +31,11 @@ namespace SDKTemplate
             UserDescription = "Result Characteristic"
         };
 
-        public static readonly Guid CalcServiceUuid = Guid.Parse("caecface-e1d9-11e6-bf01-fe55135034f0");
+        public static readonly Guid CalcServiceUuid = Guid.Parse("00001101-0000-1000-8000-00805F9B34FB");
 
-        public static readonly Guid Op1CharacteristicUuid = Guid.Parse("caec2ebc-e1d9-11e6-bf01-fe55135034f1");
-        public static readonly Guid Op2CharacteristicUuid = Guid.Parse("caec2ebc-e1d9-11e6-bf01-fe55135034f2");
-        public static readonly Guid OperatorCharacteristicUuid = Guid.Parse("caec2ebc-e1d9-11e6-bf01-fe55135034f3");
-        public static readonly Guid ResultCharacteristicUuid = Guid.Parse("caec2ebc-e1d9-11e6-bf01-fe55135034f4");
+        public static readonly Guid Op1CharacteristicUuid = Guid.Parse("00001101-0000-1000-8000-00805F9B34FB");
+        public static readonly Guid Op2CharacteristicUuid = Guid.Parse("00001101-0000-1000-8000-00805F9B34FB");
+        public static readonly Guid OperatorCharacteristicUuid = Guid.Parse("00001101-0000-1000-8000-00805F9B34FB");
+        public static readonly Guid ResultCharacteristicUuid = Guid.Parse("00001101-0000-1000-8000-00805F9B34FB");
     };
 }
