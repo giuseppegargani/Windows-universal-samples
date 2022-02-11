@@ -71,6 +71,21 @@ using Windows.UI.Xaml.Navigation;
 
 */
 
+/* PARSE FROM BYTEARRAY!!!! per bluetooth
+ https://stackoverflow.com/questions/35374492/parse-short-from-byte-array-bluetooth
+*/
+
+/* CONVERTIRE DA BYTEARRAY A STRING E VICEVERSA:
+ https://stackoverflow.com/questions/11654562/how-to-convert-byte-array-to-string
+*/
+
+/* ESEMPIO STRINGHE: 
+ f0040003bebebe023ef1
+f009000136003ff1f00100010f0010f1f002000200000002f1f003000200010004f1f007000200000007f1f008000200000008f1f00b000100000bf1f00c000101000df1
+    f002000200000002f1
+    f0-04-00-03-b1-b1-b1-02-17-f1
+*/
+
 namespace SDKTemplate
 {
     public sealed partial class Scenario1_ChatClient : Page
@@ -506,11 +521,17 @@ namespace SDKTemplate
                     return;
                 }
 
-                uint stringLength = chatReader.ReadUInt32();
-                Debug.WriteLine("valore di stringLenght " + stringLength+"\n"); //restituisce un numero troppo alto e percio' si deve escogitare un altro sistema
+                byte[] bytesPre = new byte[4];
+
+                chatReader.ReadBytes(bytesPre);
+                var hexStringPre = BitConverter.ToString(bytesPre, 0);
+                //ConversationList.Items.Add($"Received: hexa {hexStringPre}");
+
+                Debug.WriteLine($"valore di stringLenght {bytesPre} "); //restituisce un numero troppo alto e percio' si deve escogitare un altro sistema
+                
 
                 //LoadAsync non e' il metodo corretto
-                var actualStringLength = await chatReader.LoadAsync(stringLength);
+                var actualStringLength = await chatReader.LoadAsync(4026793987); //si può mettere un numero molto alto oppure una altra cosa
 
                 Debug.WriteLine($"e il valore di ActualStringhLenth {actualStringLength}");
 
@@ -546,18 +567,27 @@ namespace SDKTemplate
                 //var nuovo = elemento.ToString();
                 //byte[] nuovo = new byte[];
                 byte[] bytes = new byte[actualStringLength];
+                //var buffer = chatReader.ReadBuffer(actualStringLength);
+                
                 chatReader.ReadBytes(bytes);
-
+                //string s = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
                 //si deve usare la funzione corrispondente con bytearray!!!!
                 //string result = System.Text.Encoding.ASCII.GetString(bytes);
                 //Convert.ToHexString(bytes);
-                var result = ByteArrayToString(bytes);
-                var finale = HextoString(result);
+
+                //formule corrette:
+                //var result = ByteArrayToString(bytes);
+                //var finale = HextoString(s);
 
                 //var stringaConvertita = HextoString(result);
-                
-                ConversationList.Items.Add("Received: " + result);
-                ConversationList.Items.Add("Received: " + finale);
+                //var el = BitConverter.IsLittleEndian ? BitConverter.ToString(bytes) : BitConverter.ToString(bytes, 16);
+
+                var hexString = BitConverter.ToString(bytes,0);
+                //var stringaRes = Convert.ToBase64String(bytes);
+                string finale = (hexStringPre +"-"+ hexString).Replace("-", "").ToLower();
+
+                ConversationList.Items.Add($"Received: {finale}");
+                //ConversationList.Items.Add("Received: " + finale);
 
                 ReceiveStringLoop(chatReader);
             }
