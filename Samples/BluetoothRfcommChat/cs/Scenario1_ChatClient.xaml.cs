@@ -12,6 +12,10 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
@@ -24,6 +28,48 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+
+/* DEBUG: con windows form: https://docs.microsoft.com/it-it/visualstudio/debugger/walkthrough-debugging-a-windows-form?view=vs-2022
+    F9 per un breakpoint e F5 per debug!!!!!!
+    con F10 si esegue una linea alla volta!!!!!
+*/
+
+/* INPUTSTREAM: 
+ * Esempi:
+ https://csharp.hotexamples.com/it/examples/Windows.Storage.Streams/DataReader/ReadUInt32/php-datareader-readuint32-method-examples.html
+ */
+
+/* CONVERT TO HEXADECIMAL E OFFSET
+ * https://docs.microsoft.com/it-it/dotnet/api/system.convert.tohexstring?view=net-6.0
+ * c'è una funzione di default in System.Convert o bisogna creare una extension function?
+    Varie funzioni con hexadecimali: https://docs.microsoft.com/it-it/dotnet/csharp/programming-guide/types/how-to-convert-between-hexadecimal-strings-and-numeric-types
+    molto interessanti!!!!! Ci sono tante funzioni!!!!
+    
+*/
+
+/* FORMULE PER LA CONVERSIONE DEI DATI SONO CORRETTE E LEGGE I DATI DA APP!!
+  //sono due funzioni per la codifica dei esadecimali
+        public static string HextoString(string InputText)
+        {
+            byte[] bb = Enumerable.Range(0, InputText.Length)
+                     .Where(x => x % 2 == 0)
+                     .Select(x => Convert.ToByte(InputText.Substring(x, 2), 16))
+                     .ToArray();
+            return System.Text.Encoding.ASCII.GetString(bb);
+            // or System.Text.Encoding.UTF7.GetString
+            // or System.Text.Encoding.UTF8.GetString
+            // or System.Text.Encoding.Unicode.GetString
+            // or etc.
+        }
+        public static string ByteArrayToString(byte[] ba)
+        {
+            StringBuilder hex = new StringBuilder(ba.Length * 2);
+            foreach (byte b in ba)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
+        }
+
+*/
 
 namespace SDKTemplate
 {
@@ -42,6 +88,7 @@ namespace SDKTemplate
         private DeviceWatcher deviceWatcher = null;
         private StreamSocket chatSocket = null;
         private DataWriter chatWriter = null;
+        //questa e' una RfcommDeviceService
         private RfcommDeviceService chatService = null;
         private BluetoothDevice bluetoothDevice;
 
@@ -299,7 +346,7 @@ namespace SDKTemplate
             var serviceNameLength = attributeReader.ReadByte();
 
             // The Service Name attribute requires UTF-8 encoding.
-            attributeReader.UnicodeEncoding = UnicodeEncoding.Utf8;
+            attributeReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
 
             StopWatcher();
 
@@ -307,14 +354,26 @@ namespace SDKTemplate
             {
                 chatSocket = new StreamSocket();
             }
+
+            /* Crea un socket e lo connette al target!!! con connectAsync!!! 
+             In realta' sono delle istruzioni semplici che leggono in modo asincrono dei dati
+            */
+
             try
-            {
+            {   //messi da Giuseppe!!!
+                var connectionName = chatService.ConnectionHostName;
+                var serviceName = chatService.ConnectionServiceName;
+
                 await chatSocket.ConnectAsync(chatService.ConnectionHostName, chatService.ConnectionServiceName);
 
                 SetChatUI(attributeReader.ReadString(serviceNameLength), bluetoothDevice.Name);
                 chatWriter = new DataWriter(chatSocket.OutputStream);
 
+                var socket = chatSocket.InputStream;
+
                 DataReader chatReader = new DataReader(chatSocket.InputStream);
+                chatReader.InputStreamOptions = InputStreamOptions.Partial;
+
                 ReceiveStringLoop(chatReader);
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80070490) // ERROR_ELEMENT_NOT_FOUND
@@ -374,12 +433,18 @@ namespace SDKTemplate
         /// </summary>
         private async void SendMessage()
         {
+
+            var messaggioInviato = "Stringa";  //fatto da Giuseppe per verificare la scrittura
+
+
+            //c'è un blocco di gestione delle risorse
             try
             {
                 if (MessageTextBox.Text.Length != 0)
                 {
+                    messaggioInviato = MessageTextBox.Text;
                     chatWriter.WriteUInt32((uint)MessageTextBox.Text.Length);
-                    chatWriter.WriteString(MessageTextBox.Text);
+                    chatWriter.WriteString(messaggioInviato);
 
                     ConversationList.Items.Add("Sent: " + MessageTextBox.Text);
                     MessageTextBox.Text = "";
@@ -395,11 +460,46 @@ namespace SDKTemplate
             }
         }
 
+        //sono due funzioni per la codifica dei esadecimali
+        public static string HextoString(string InputText)
+        {
+            byte[] bb = Enumerable.Range(0, InputText.Length)
+                     .Where(x => x % 2 == 0)
+                     .Select(x => Convert.ToByte(InputText.Substring(x, 2), 16))
+                     .ToArray();
+            return System.Text.Encoding.ASCII.GetString(bb);
+            // or System.Text.Encoding.UTF7.GetString
+            // or System.Text.Encoding.UTF8.GetString
+            // or System.Text.Encoding.Unicode.GetString
+            // or etc.
+        }
+        public static string ByteArrayToString(byte[] ba)
+        {
+            StringBuilder hex = new StringBuilder(ba.Length * 2);
+            foreach (byte b in ba)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
+        }
+
+        /* E' un loop che riceve i dati e si puo' personalizzare come si vuole!!!!
+            qui si ricevono i messaggi!!!
+        qui si possono scrivere tante cose su quello che si andra' a fare
+         */
+
         private async void ReceiveStringLoop(DataReader chatReader)
         {
+
+            //chatReader.UnicodeEncoding = UnicodeEncoding.Utf8;
+            //chatReader.ByteOrder = ByteOrder.LittleEndian;
+
             try
             {
                 uint size = await chatReader.LoadAsync(sizeof(uint));
+                //TimeSpan messaggio = chatReader.ReadTimeSpan(); //.ReadTimeout = TimeSpan.FromMilliseconds(100);
+                //var messaggio = chatReader.ReadBuffer(1024);
+                //var michele = chatReader.ReadBuffer(1024);
+                Debug.WriteLine($"dimensione size {size}");
+
                 if (size < sizeof(uint))
                 {
                     Disconnect("Remote device terminated connection - make sure only one instance of server is running on remote device");
@@ -407,14 +507,57 @@ namespace SDKTemplate
                 }
 
                 uint stringLength = chatReader.ReadUInt32();
-                uint actualStringLength = await chatReader.LoadAsync(stringLength);
-                if (actualStringLength != stringLength)
+                Debug.WriteLine("valore di stringLenght " + stringLength+"\n"); //restituisce un numero troppo alto e percio' si deve escogitare un altro sistema
+
+                //LoadAsync non e' il metodo corretto
+                var actualStringLength = await chatReader.LoadAsync(stringLength);
+
+                Debug.WriteLine($"e il valore di ActualStringhLenth {actualStringLength}");
+
+                /*try
                 {
+                    var timeoutSource = new CancellationTokenSource(1000); // 1000 ms
+                    uint numberBytesToRead = 256;
+                    var data = await chatReader.LoadAsync(numberBytesToRead).AsTask(timeoutSource.Token);
+                    ConversationList.Items.Add("Received: " + chatReader.ReadString(data));
+                }
+                catch { }*/
+
+
+                /*if (actualStringLength != stringLength)
+                {
+                    var stringa = "eccomi";
+                    ConversationList.Items.Add("Received: " + chatReader.ReadString(actualStringLength));
                     // The underlying socket was closed before we were able to read the whole data
                     return;
                 }
+                var stringa2 = "eccomi";*/
 
-                ConversationList.Items.Add("Received: " + chatReader.ReadString(stringLength));
+                //byte[] bytes = Encoding.UTF8.GetBytes(chatReader.ReadString(actualStringLength));
+                //byte[] bytes = Encoding.UTF8.GetBytes(chatReader.ReadString(actualStringLength));
+
+                //Debug.WriteLine($"e il valore dei bytes e {bytes} ");
+
+                //var stringa = Convert.ToBase64String(bytes);
+
+                //Debug.WriteLine($" e la stringa ricevuta: {stringa}");
+                //var elemento = chatReader.ReadBuffer(actualStringLength);    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //string result = System.Text.Encoding.UTF8.GetString(elemento);
+                //var nuovo = elemento.ToString();
+                //byte[] nuovo = new byte[];
+                byte[] bytes = new byte[actualStringLength];
+                chatReader.ReadBytes(bytes);
+
+                //si deve usare la funzione corrispondente con bytearray!!!!
+                //string result = System.Text.Encoding.ASCII.GetString(bytes);
+                //Convert.ToHexString(bytes);
+                var result = ByteArrayToString(bytes);
+                var finale = HextoString(result);
+
+                //var stringaConvertita = HextoString(result);
+                
+                ConversationList.Items.Add("Received: " + result);
+                ConversationList.Items.Add("Received: " + finale);
 
                 ReceiveStringLoop(chatReader);
             }
@@ -577,5 +720,9 @@ namespace SDKTemplate
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
+
     }
+    
 }
+
+

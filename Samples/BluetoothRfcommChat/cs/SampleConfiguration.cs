@@ -17,7 +17,7 @@ namespace SDKTemplate
 {
     public partial class MainPage : Page
     {
-        public const string FEATURE_NAME = "Bluetooth Rfcomm Chat Sample";
+        public const string FEATURE_NAME = "BluetoothRfcommChat Sample";
 
         List<Scenario> scenarios = new List<Scenario>
         {
@@ -63,6 +63,6 @@ namespace SDKTemplate
         public const byte SdpServiceNameAttributeType = (4 << 3) | 5;
 
         // The value of the Service Name SDP attribute
-        public const string SdpServiceName = "Bluetooth Rfcomm Chat Service";
+        public const string SdpServiceName = "BluetoothRfcommChatService";
     }
 }
